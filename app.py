@@ -6,10 +6,23 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    """ 
+    Render the index page with the search form. 
+    
+    Returns: 
+        str: Rendered HTML of the index page. 
+    """
     return render_template('index.html')
 
 @app.route('/results', methods=['POST'])
 def results():
+    """ 
+    Handle the form submission, perform searches on Preloved and Freecycle, 
+    and render the results page with the search results. 
+    
+    Returns: 
+        str: Rendered HTML of the results page with search results. 
+    """
     keyword = request.form['keyword']
     user_location = request.form['location']
     distance = request.form['distance']
@@ -20,10 +33,23 @@ def results():
     return render_template('results.html', preloved_results=preloved_results, freecycle_results=freecycle_results)
 
 
-######
+import requests
+from bs4 import BeautifulSoup
 
 class PrelovedScraper:
+    """
+    A class to scrape listings from Preloved based on keywords, location, and distance.
+    """
+
     def __init__(self, keywords="", user_location="", distance=""):
+        """
+        Initialize the PrelovedScraper with search parameters.
+
+        Args:
+            keywords (str): The search keywords.
+            user_location (str): The location for the search.
+            distance (str): The search radius in miles.
+        """
         self.keywords = keywords
         self.user_location = user_location
         self.distance = distance
@@ -31,16 +57,27 @@ class PrelovedScraper:
         self.page_n = 1
 
     def parse_page(self):
+        """
+        Parse the HTML content of a search results page.
+
+        Sets:
+            self.soup (BeautifulSoup): Parsed HTML content of the page.
+        """
         url = f"https://www.preloved.co.uk/search?keyword={self.keywords}&location={self.user_location}&distance={self.distance}&promotionType=free&page={self.page_n}"
         response = requests.get(url)
         self.soup = BeautifulSoup(response.text, 'html.parser')
-   
 
     def find_listings_in_a_page(self):
-        listing_names = self.soup.find_all("span",itemprop = "name")
-        locations = self.soup.find_all("span",{'data-test-element': 'advert-location'})
-        images = self.soup.find_all("img", {"data-defer":"src"})
-        links = self.soup.find_all("a",class_='search-result__title is-title')
+        """
+        Find listings on the current page.
+
+        Returns:
+            list: A list of dictionaries containing listing details.
+        """
+        listing_names = self.soup.find_all("span", itemprop="name")
+        locations = self.soup.find_all("span", {'data-test-element': 'advert-location'})
+        images = self.soup.find_all("img", {"data-defer": "src"})
+        links = self.soup.find_all("a", class_='search-result__title is-title')
 
         listings_in_a_page = []
 
@@ -55,48 +92,41 @@ class PrelovedScraper:
         return listings_in_a_page
 
     def num_of_pages(self):
+        """
+        Determine the number of pages in the search results.
+
+        Sets:
+            self.page_n (int): The number of pages in the search results.
+        """
         # Check if there are multiple pages
-        has_next = self.soup.find("span", {"data-test-element" :"has-next"})
+        has_next = self.soup.find("span", {"data-test-element": "has-next"})
 
         if has_next:
             page_n = has_next.text.split(' ')[-1]
         else:
-            page_n  = "1"
+            page_n = "1"
             
-        self.page_n  = page_n 
+        self.page_n = page_n
 
     def find_listings_in_all_pages(self):
+        """
+        Find listings across all pages of search results.
+
+        Returns:
+            list: A list of dictionaries containing all listings.
+        """
         self.parse_page()
         self.num_of_pages()
         
         all_listings = []
 
-        for page in range(int(self.page_n)+1):
-            
-            if page !=0:
-                all_listings = all_listings + self.find_listings_in_a_page()
+        for page in range(int(self.page_n) + 1):
+            if page != 0:
+                all_listings += self.find_listings_in_a_page()
             
         return all_listings
+
     
-
-###
-
-# def get_preloved_results(keyword, location, distance):
-#     url = f"https://www.preloved.co.uk/search?keyword={keyword}&location={location}&distance={distance}&promotionType=free&page={page_num}"
-#     response = requests.get(url)
-#     soup = BeautifulSoup(response.text, 'html.parser')
-    
-#     has_next = soup.find("span", {"data-test-element" :"has-next"})
-#     if has_next:
-#         num_of_pages = int(has_next.text.split(' ')[-1])
-#     listings = []
-#     for item in soup.find_all('a', class_='search-result__title is-title'):
-#         title = item.find('span', itemprop='name').text
-#         link = item['href']
-#         location = item.find_next('span', {'data-test-element': 'advert-location'}).text
-#         listings.append({'title': title, 'link': link, 'location': location})
-
-#     return listings
 
 def get_freecycle_results(keyword, location, distance):
     # Implement similar logic to scrape Freecycle
