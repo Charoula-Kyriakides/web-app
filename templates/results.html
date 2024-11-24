@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <h2>Preloved Results</h2>
+    <ul>
+        {% for listing in preloved_results %}
+            <li>
+                <strong>{{listing.name}} </strong> 
+                <br>
+                <strong>{{listing.location}} </strong> <br>
+                <a href="{{ listing.link }}">
+                    <img src="{{listing.image}}" alt="{{ listing.name }}" width="200">
+                </a> 
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Freecycle Results</h2>
+    <ul>
+        {% for listing in freecycle_results %}
+            <li>
+                <a href="{{ listing.link }}">{{ listing.title }}</a> - {{ listing.location }}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="/">Back to Search</a>
+</body>
+</html>
