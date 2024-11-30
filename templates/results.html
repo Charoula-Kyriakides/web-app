@@ -24,7 +24,12 @@
     <ul>
         {% for listing in freecycle_results %}
             <li>
-                <a href="{{ listing.link }}">{{ listing.title }}</a> - {{ listing.location }}
+                <strong>{{listing.name}} </strong> 
+                <br>
+                <strong>{{listing.location}} </strong> <br>
+                <a href="{{ listing.link }}">
+                    <img src="{{listing.image}}" alt="{{ listing.name }}" width="200">
+                </a> 
             </li>
         {% endfor %}
     </ul>

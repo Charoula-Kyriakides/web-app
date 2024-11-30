@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import requests
 from bs4 import BeautifulSoup
+import gumtree_scraper
 
 app = Flask(__name__)
 
@@ -21,20 +22,18 @@ def results():
     and render the results page with the search results. 
     
     Returns: 
-        str: Rendered HTML of the results page with search results. 
+        str: Rendered HTML of tshe results page with search results. 
     """
     keyword = request.form['keyword']
     user_location = request.form['location']
     distance = request.form['distance']
 
     preloved_results = PrelovedScraper(keyword, user_location, distance).find_listings_in_all_pages()
-    freecycle_results = get_freecycle_results(keyword, user_location, distance)
+    gumtree_results = gumtree_scraper.GumtreeScraper(keyword, user_location, distance).find_listings_in_all_pages()
 
-    return render_template('results.html', preloved_results=preloved_results, freecycle_results=freecycle_results)
+    return render_template('results.html', preloved_results=preloved_results, freecycle_results=gumtree_results)
 
 
-import requests
-from bs4 import BeautifulSoup
 
 class PrelovedScraper:
     """
@@ -65,7 +64,9 @@ class PrelovedScraper:
         """
         url = f"https://www.preloved.co.uk/search?keyword={self.keywords}&location={self.user_location}&distance={self.distance}&promotionType=free&page={self.page_n}"
         response = requests.get(url)
+      
         self.soup = BeautifulSoup(response.text, 'html.parser')
+        
 
     def find_listings_in_a_page(self):
         """
@@ -127,10 +128,6 @@ class PrelovedScraper:
         return all_listings
 
     
-
-def get_freecycle_results(keyword, location, distance):
-    # Implement similar logic to scrape Freecycle
-    return []
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
