@@ -20,11 +20,16 @@
             </li>
         {% endfor %}
     </ul>
-    <h2>Freecycle Results</h2>
+    <h2>Gumtree Results </h2>
     <ul>
-        {% for listing in freecycle_results %}
+        {% for listing in gumtree_results %}
             <li>
-                <a href="{{ listing.link }}">{{ listing.title }}</a> - {{ listing.location }}
+                <strong>{{listing.name}} </strong> 
+                <br>
+                <strong>{{listing.location}} </strong> <br>
+                <a href="{{ listing.link }}">
+                    <img src="{{listing.image}}" alt="{{ listing.name }}" width="200">
+                </a> 
             </li>
         {% endfor %}
     </ul>
