@@ -13,7 +13,7 @@
           <div class="row">
             <div class="col-md-3">
               <a href="{{ listing.link }}">
-                <img src="{{ listing.image }}" alt="{{ listing.name }}" class="img-fluid" style="width: 200px; height: 150px; object-fit: cover;">
+                <img src="{{ listing.image if listing.image != 'placeholder' else url_for('static', filename='images/default.jpg') }}" alt="{{ listing.name }}" class="img-fluid" style="width: 200px; height: 150px; object-fit: cover;">
               </a>
             </div>
             <div class="col-md-9">
@@ -26,18 +26,18 @@
       {% endfor %}
     </ul>
     
-    <h2 class="mt-4 bg-warning text-dark p-2">Gumtree Results</h2>
+    <h2 class="mt-4 bg-success text-white p-2">Gumtree Results</h2>
     <ul class="list-group bg-light">
       {% for listing in gumtree_results %}
         <li class="list-group-item">
           <div class="row">
             <div class="col-md-3">
               <a href="{{ listing.link }}">
-                <img src="{{ listing.image }}" alt="{{ listing.name }}" class="img-fluid" style="width: 200px; height: 150px; object-fit: cover;">
+                <img src="{{ listing.image if listing.image != 'placeholder' else url_for('static', filename='images/missing_image.jpg') }}" alt="{{ listing.name }}" class="img-fluid" style="width: 200px; height: 150px; object-fit: cover;">
               </a>
             </div>
             <div class="col-md-9">
-              <strong class="text-warning h4">{{ listing.name }}</strong>
+              <strong class="text-success h4">{{ listing.name }}</strong>
               <br>
               <strong class="text-secondary h6">{{ listing.location }}</strong>
             </div>

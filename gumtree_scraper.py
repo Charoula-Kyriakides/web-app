@@ -32,11 +32,11 @@ class GumtreeScraper:
         """
     
         url = f"https://www.gumtree.com/search?search_category=freebies&search_location={self.user_location}&search_distance={self.distance}&q={self.keywords}&page={self.page_n}"
-  
+        
         response = requests.get(url, headers=self.headers)
         decoded_text = urllib.parse.unquote(response.text)
-   
         self.soup = BeautifulSoup(decoded_text, 'html.parser')
+        print(url)
         
     def find_listings_in_a_page(self):
         """
@@ -49,6 +49,7 @@ class GumtreeScraper:
             list: A list of dictionaries containing listing details, each with keys 
                 'name', 'location', 'image', and 'link'.
         """
+        
         ads = self.soup.find("div",{"class":"css-zfj6vx"})
         listing_names = ads.find_all("div", {'class':"css-iqq11e"}) 
         locations = ads.find_all("div", {'class': 'css-30gart'}) 
@@ -58,20 +59,24 @@ class GumtreeScraper:
 
     
         listings_in_a_page = []
-    
-        for item in range(len(images)):
+       
+        for item in range(len(listing_names)):
             listing_details = dict()
             listing_details['name'] = listing_names[item].text
             listing_details['location'] = locations[item].text
             
-            if item < 2:
-                listing_details['image'] = images[item].find("img").get('src')
+            # Check if the image is a placeholder
+            test_image = images[item].find("img")
+            if test_image:
+                if item < 2:
+                    listing_details['image'] = test_image.get('src')
+                else:
+                    listing_details['image'] = test_image.get('data-src')
             else:
-                listing_details['image'] = images[item].find("img").get('data-src')
-                
+                listing_details['image'] = "placeholder"
             listing_details['link'] = "https://www.gumtree.com/" + links[item].get('href')
             listings_in_a_page.append(listing_details)
-
+    
         return listings_in_a_page
 
     def num_of_pages(self):
@@ -110,4 +115,4 @@ class GumtreeScraper:
         return all_listings
 
 
-gumtree_results = GumtreeScraper("sofa", r"e14%206dn", "5").find_listings_in_all_pages()
+
