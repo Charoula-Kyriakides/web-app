@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-
+from flask_bootstrap import Bootstrap
 from gumtree_scraper import GumtreeScraper
 from preloved_scraper import PrelovedScraper
 
@@ -33,9 +33,6 @@ def results():
 
     return render_template('results.html', preloved_results=preloved_results, gumtree_results=gumtree_results)
 
-
-
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
