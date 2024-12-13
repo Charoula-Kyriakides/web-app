@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+import urllib.parse
 
-
-class PrelovedScraper:
+class GumtreeScraper:
     """
     A class to scrape listings from Preloved based on keywords, location, and distance.
     """
@@ -21,6 +21,7 @@ class PrelovedScraper:
         self.distance = distance
         self.soup = None
         self.page_n = 1
+        self.headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" }
 
     def parse_page(self):
         """
@@ -29,32 +30,45 @@ class PrelovedScraper:
         Sets:
             self.soup (BeautifulSoup): Parsed HTML content of the page.
         """
-        url = f"https://www.preloved.co.uk/search?keyword={self.keywords}&location={self.user_location}&distance={self.distance}&promotionType=free&page={self.page_n}"
-        response = requests.get(url)
-      
+    
+        url = f"https://www.gumtree.com/search?search_category=freebies&search_location={self.user_location}&search_distance={self.distance}&q={self.keywords}&page={self.page_n}"
+  
+        response = requests.get(url, headers=self.headers)
+   
         self.soup = BeautifulSoup(response.text, 'html.parser')
         
-
     def find_listings_in_a_page(self):
         """
         Find listings on the current page.
 
+        This method extracts listing details such as name, location, image URL, and link 
+        from the parsed HTML content of a search results page using BeautifulSoup.
+
         Returns:
-            list: A list of dictionaries containing listing details.
+            list: A list of dictionaries containing listing details, each with keys 
+                'name', 'location', 'image', and 'link'.
         """
-        listing_names = self.soup.find_all("span", itemprop="name")
-        locations = self.soup.find_all("span", {'data-test-element': 'advert-location'})
-        images = self.soup.find_all("img", {"data-defer": "src"})
-        links = self.soup.find_all("a", class_='search-result__title is-title')
+        ads = self.soup.find("div",{"class":"css-zfj6vx"})
+        listing_names = ads.find_all("div", {'class':"css-iqq11e"}) 
+        locations = ads.find_all("div", {'class': 'css-30gart'}) 
+        images = ads.find_all("div", class_="css-1r4pvhe e25keea15")
+        
+        links = ads.find_all("a")
 
+    
         listings_in_a_page = []
-
+    
         for item in range(len(images)):
             listing_details = dict()
             listing_details['name'] = listing_names[item].text
             listing_details['location'] = locations[item].text
-            listing_details['image'] = images[item].get('data-src')
-            listing_details['link'] = links[item].get('href')
+            
+            if item < 2:
+                listing_details['image'] = images[item].find("img").get('src')
+            else:
+                listing_details['image'] = images[item].find("img").get('data-src')
+                
+            listing_details['link'] = "https://www.gumtree.com/" + links[item].get('href')
             listings_in_a_page.append(listing_details)
 
         return listings_in_a_page
@@ -67,14 +81,15 @@ class PrelovedScraper:
             self.page_n (int): The number of pages in the search results.
         """
         # Check if there are multiple pages
-        has_next = self.soup.find("span", {"data-test-element": "has-next"})
-
-        if has_next:
-            page_n = has_next.text.split(' ')[-1]
+       # has_next = self.soup.find("h2",{"class":"css-130y58l"})
+        has_next = self.soup.find_all("a", {"class":"button pagination-link css-1vrkhz0"})
+        if has_next: 
+            self.page = "1"
+            self.page_n = has_next[-1].text
         else:
-            page_n = "1"
-            
-        self.page_n = page_n
+            self.page_n = "1"
+        print(self.page_n)                                                        
+       
 
     def find_listings_in_all_pages(self):
         """
@@ -87,9 +102,13 @@ class PrelovedScraper:
         self.num_of_pages()
         
         all_listings = []
-
+    
         for page in range(int(self.page_n) + 1):
             if page != 0:
                 all_listings += self.find_listings_in_a_page()
             
         return all_listings
+
+
+gumtree_results = GumtreeScraper("sofa", r"e14%206dn", "5").find_listings_in_all_pages()
+print(gumtree_results)
