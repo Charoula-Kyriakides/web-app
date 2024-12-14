@@ -1,10 +1,11 @@
-from base_scraper import BaseScraper
+from .base_scraper import BaseScraper
 
 class GumtreeScraper(BaseScraper):
     def __init__(self,  keywords="", user_location="", distance=""):
         url_template = "https://www.gumtree.com/search?search_category=freebies&search_location={user_location}&search_distance={distance}&q={keywords}&page={page_n}"
         super().__init__(url_template, keywords, user_location, distance)
         self.format_url()
+        print(self.url)
         
     def get_pagination_element(self):
         return self.soup.find_all("a", {"class": "button pagination-link css-1vrkhz0"})
@@ -35,9 +36,3 @@ class GumtreeScraper(BaseScraper):
     
     def get_full_link(self, link):
         return "https://www.gumtree.com" + link
-
-        
-
-
-# gumtree_results = GumtreeScraper("sofa", r"e14%206dn", "5").find_listings_in_all_pages()
-# print(gumtree_results)
