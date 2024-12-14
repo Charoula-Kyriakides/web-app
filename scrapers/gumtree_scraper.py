@@ -29,10 +29,15 @@ class GumtreeScraper(BaseScraper):
         return "a"
     
     def get_image_src(self, image, item):
-        if item < 2:
-            return image.find("img").get('src')
-        else:
-            return image.find("img").get('data-src')
-    
+        if image.find("img") is not None:
+            if item < 2:
+                return image.find("img").get('src')
+            else:
+                return image.find("img").get('data-src')
+
+        
     def get_full_link(self, link):
         return "https://www.gumtree.com" + link
+
+    def extened_search(self):
+        return self.soup.find("h2",{"class":"css-130y58l"} ).text == "Results from outside your search"

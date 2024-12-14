@@ -31,6 +31,3 @@ class PrelovedScraper(BaseScraper):
     
     def extract_page_n(self, pagination_element):
         return pagination_element.text.split(' ')[-1]
-    
-gumtree_results = PrelovedScraper("sofa", r"london", "10").find_listings_in_all_pages()
-print(gumtree_results)
