@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
-from gumtree_scraper import GumtreeScraper
-from preloved_scraper import PrelovedScraper
+from scrapers.gumtree_scraper import GumtreeScraper
+from scrapers.preloved_scraper import PrelovedScraper
 
 app = Flask(__name__)
 

@@ -4,6 +4,7 @@ class PrelovedScraper(BaseScraper):
         url_template = "https://www.preloved.co.uk/search?keyword={keywords}&location={user_location}&distance={distance}&promotionType=free&page={page_n}"
         super().__init__(url_template, keywords, user_location, distance)
         self.format_url()
+        print(self.url)
         
     def get_ads_container(self):
         return self.soup
@@ -21,7 +22,12 @@ class PrelovedScraper(BaseScraper):
         return "a", {"class": "search-result__title is-title"}
     
     def get_image_src(self, image, item):
-        return image.get('data-src')
+        image_scr = image.get('data-src')
+        
+        if image_scr is None:
+            image_scr = "placeholder"
+            
+        return image_scr
     
     def get_full_link(self, link):
         return link

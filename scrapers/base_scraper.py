@@ -22,6 +22,7 @@ class BaseScraper:
         self.soup = None
         self.page_n = 1
         self.url_template = url
+        self.ads = False
         self.headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" }
 
     
@@ -52,8 +53,8 @@ class BaseScraper:
             self.page_n (int): The number of pages in the search results.
         """
         has_next = self.get_pagination_element()
-
-        if has_next:    
+        extended = self.extened_search()
+        if has_next and not extended:    
             self.page_n = self.extract_page_n(has_next)
         else:
             self.page_n = "1"   
@@ -68,11 +69,17 @@ class BaseScraper:
         """
         
         ads = self.get_ads_container()
+        
+        if ads is None:
+            return []
+
         listing_names = ads.find_all(*self.get_listing_name_selector())
         locations = ads.find_all(*self.get_location_selector())
         images = ads.find_all(*self.get_image_selector())
         links = ads.find_all(*self.get_link_selector())
 
+
+        
         listings_in_a_page = []
 
         for item in range(len(images)):
@@ -94,16 +101,20 @@ class BaseScraper:
         Returns:
             list: A list of dictionaries containing all listings.
         """
+
         self.parse_page()
         self.num_of_pages()
         all_listings = []
-
+        
         for page in range(int(self.page_n)  + 1):
-            if page != 0:
+            if page != 0 and page < 4:
                 all_listings += self.find_listings_in_a_page()
-            
+        
         return all_listings
 
+    
+    def extened_search(self):
+        return False
             
     def get_ads_container(self):
         raise NotImplementedError("Subclasses should implement this method")

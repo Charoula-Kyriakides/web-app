@@ -5,7 +5,6 @@ class GumtreeScraper(BaseScraper):
         url_template = "https://www.gumtree.com/search?search_category=freebies&search_location={user_location}&search_distance={distance}&q={keywords}&page={page_n}"
         super().__init__(url_template, keywords, user_location, distance)
         self.format_url()
-        print(self.url)
         
     def get_pagination_element(self):
         return self.soup.find_all("a", {"class": "button pagination-link css-1vrkhz0"})
@@ -35,9 +34,12 @@ class GumtreeScraper(BaseScraper):
             else:
                 return image.find("img").get('data-src')
 
-        
+        else:
+            return "placeholder"
     def get_full_link(self, link):
         return "https://www.gumtree.com" + link
 
     def extened_search(self):
-        return self.soup.find("h2",{"class":"css-130y58l"} ).text == "Results from outside your search"
+        check = self.soup.find("h2",{"class":"css-130y58l"} )
+        if check is not None:
+            return check.text == "Results from outside your search"
