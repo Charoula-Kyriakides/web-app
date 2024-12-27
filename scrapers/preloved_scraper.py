@@ -29,9 +29,6 @@ class PrelovedScraper(BaseScraper):
             
         return image_scr
     
-    def get_full_link(self, link):
-        return link
-    
     def get_pagination_element(self):
         return self.soup.find("span", {"data-test-element": "has-next"})
     

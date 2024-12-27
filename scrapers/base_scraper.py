@@ -111,11 +111,13 @@ class BaseScraper:
                 all_listings += self.find_listings_in_a_page()
         
         return all_listings
-
     
     def extened_search(self):
         return False
-            
+    
+    def get_full_link(self, link):
+        return link
+    
     def get_ads_container(self):
         raise NotImplementedError("Subclasses should implement this method")
     
@@ -132,9 +134,6 @@ class BaseScraper:
         raise NotImplementedError("Subclasses should implement this method")
     
     def get_image_src(self, image, item):
-        raise NotImplementedError("Subclasses should implement this method")
-    
-    def get_full_link(self, link):
         raise NotImplementedError("Subclasses should implement this method")
 
     def get_pagination_element(self):

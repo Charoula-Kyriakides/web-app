@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request
-from flask_bootstrap import Bootstrap
 from scrapers.gumtree_scraper import GumtreeScraper
 from scrapers.preloved_scraper import PrelovedScraper
 
 app = Flask(__name__)
 
+
+                                        
 @app.route('/')
 def index():
     """ 
@@ -30,7 +31,7 @@ def results():
 
     preloved_results = PrelovedScraper(keyword, user_location, distance).find_listings_in_all_pages()
     gumtree_results = GumtreeScraper(keyword, user_location, distance).find_listings_in_all_pages()
-
+    #freeads_results = FreeadsScraper(keyword, user_location, distance).find_listings_in_all_pages()
     return render_template('results.html', preloved_results=preloved_results, gumtree_results=gumtree_results)
 
 
